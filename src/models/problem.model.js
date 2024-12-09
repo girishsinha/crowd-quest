@@ -1,6 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 const problemSchema = new Schema(
     {
+        image: {
+            type: String, // cloudinary url,
+        },
+
         title: {
             type: String,
             required: true

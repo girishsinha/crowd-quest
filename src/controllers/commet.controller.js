@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 
 
 const getComments = asyncHandler(async (req, res) => {
-    //TODO: get all comments for a video
+    //TODO: get all comments for a problem
     const { problemId } = req.params
     const { page = 1, limit = 10 } = req.query
 
@@ -20,7 +20,7 @@ const getComments = asyncHandler(async (req, res) => {
 })
 
 const addComment = asyncHandler(async (req, res) => {
-    // TODO: add a comment to a video
+    // TODO: add a comment to a problem
     const { content, problemId } = req.body
     if (!content || !problemId) {
         throw new ApiError(400, "empty content");

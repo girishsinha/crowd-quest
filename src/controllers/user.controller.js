@@ -114,7 +114,7 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "username or email is required")
     }
 
-    // Here is an alternative of above code based on logic discussed in video:
+    // Here is an alternative of above code based on logic discussed in problem:
     // if (!(username || email)) {
     //     throw new ApiError(400, "username or email is required")
 
@@ -436,7 +436,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-                from: "videos",
+                from: "problems",
                 localField: "watchHistory",
                 foreignField: "_id",
                 as: "watchHistory",

@@ -3,7 +3,8 @@ import {
     getAllProblem,
     publishProblem,
     getProblemById,
-    deleteProblem
+    getMyProblem,
+    deleteProblem,
 } from "../controllers/problem.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 import { upload } from "../middlewares/multer.middleware.js"
@@ -31,5 +32,5 @@ router
     .get(getProblemById)
     .delete(deleteProblem)
 
-
+router.route("/userProblems/:username").get(getMyProblem)
 export default router

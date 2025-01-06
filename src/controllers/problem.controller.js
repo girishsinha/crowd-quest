@@ -91,11 +91,11 @@ const getProblemById = asyncHandler(async (req, res) => {
     const { problemId } = req.params;
 
     if (!isValidObjectId(problemId)) {
-        throw new ApiError(400, "Invalid Video ID");
+        throw new ApiError(400, "Invalid problem ID");
     }
     const problem = await Problem.findById(problemId);
     if (!problem) {
-        throw new ApiError(404, "No video found");
+        throw new ApiError(404, "No problem found");
     }
     return res.status(200).json(new ApiResponse(200, problem, "problem Fetched"));
 
@@ -128,11 +128,47 @@ const deleteProblem = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {}, "Problem Deleted"));
 });
 
+const getMyProblem = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+    const Problems = await Problem.aggregate([
+        {
+            $lookup: {
+                from: "users",
+                localField: "postedBy",
+                foreignField: "_id",
+                as: "createdBy",
+            },
+        },
+        {
+            $unwind: "$createdBy",
+        },
+        {
+            $match: { "createdBy.username": username }, // Filter where the username matches
+        },
+        {
+            $project: {
+                image: 1,
+                title: 1,
+                description: 1,
+                tags: 1,
+                createdBy: {
+                    fullName: 1,
+                    username: 1,
+                    avatar: 1,
+                },
+            },
+        },
+    ])
+    return res
+        .status(200)
+        .json(new ApiResponse(200, Problems, "Fetched yuor problems"));
+})
 
 
 export {
     getAllProblem,
     publishProblem,
     getProblemById,
-    deleteProblem
+    deleteProblem,
+    getMyProblem
 }

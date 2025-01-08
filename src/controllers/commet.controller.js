@@ -10,7 +10,33 @@ const getComments = asyncHandler(async (req, res) => {
     const { problemId } = req.params
     const { page = 1, limit = 10 } = req.query
 
-    const comments = await Comment.find({ Problem: problemId })
+    // const comments = await Comment.find({ Problem: problemId })
+    const comments = await Comment.aggregate(
+        [
+            {
+                $match: {
+                    Problem: new mongoose.Types.ObjectId(problemId)
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "createdBy",
+                },
+            }, { $unwind: "$createdBy", }, {
+                $project: {
+                    content: 1,
+                    owner: 1,
+                    createdBy: {
+                        username: 1,
+                        avatar: 1,
+                    },
+                },
+            }
+        ]
+    )
     if (!comments) {
         throw new ApiError(500, "Error while fetching comments");
 
@@ -28,7 +54,7 @@ const addComment = asyncHandler(async (req, res) => {
 
     const comment = await Comment.create({
         content,
-        Problem: problemId,
+        Problem: new mongoose.Types.ObjectId(problemId),
         owner: req.user._id,
 
     })

@@ -93,11 +93,43 @@ const getProblemById = asyncHandler(async (req, res) => {
     if (!isValidObjectId(problemId)) {
         throw new ApiError(400, "Invalid problem ID");
     }
-    const problem = await Problem.findById(problemId);
-    if (!problem) {
+
+    const Problems = await Problem.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(problemId)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "postedBy",
+                foreignField: "_id",
+                as: "createdBy",
+            },
+        },
+        {
+            $unwind: "$createdBy",
+        },
+        {
+            $project: {
+                image: 1,
+                title: 1,
+                description: 1,
+                tags: 1,
+                createdBy: {
+                    fullName: 1,
+                    username: 1,
+                    avatar: 1,
+                },
+                createdAt: 1,
+            },
+        },]);
+    // const problem = await Problem.findById(problemId);
+    if (!Problems) {
         throw new ApiError(404, "No problem found");
     }
-    return res.status(200).json(new ApiResponse(200, problem, "problem Fetched"));
+    return res.status(200).json(new ApiResponse(200, Problems[0], "problem Fetched"));
 
 });
 

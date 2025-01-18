@@ -20,7 +20,7 @@ const generateAccessAndRefereshTokens = async (userId) => {
 
 
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while generating referesh and access token")
+        throw new ApiError(500, error, "Something went wrong while generating referesh and access token")
     }
 }
 
@@ -139,8 +139,10 @@ const loginUser = asyncHandler(async (req, res) => {
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
     const options = {
-        httpOnly: true,
-        secure: true
+        httpOnly: true, // Prevent access from JavaScript
+        secure: true, // Ensure cookies are sent over HTTPS
+        sameSite: "none", // Allow cross-site cookies
+        maxAge: 24 * 60 * 60 * 1000, // Cookie expiry in milliseconds
     }
 
     return res

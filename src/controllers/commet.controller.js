@@ -48,13 +48,15 @@ const getComments = asyncHandler(async (req, res) => {
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a problem
     const { content, problemId } = req.body
+
     if (!content || !problemId) {
         throw new ApiError(400, "empty content");
     }
 
     const comment = await Comment.create({
         content,
-        Problem: new mongoose.Types.ObjectId(problemId),
+        // Problem: new mongoose.Types.ObjectId(problemId),
+        Problem: problemId,
         owner: req.user._id,
 
     })

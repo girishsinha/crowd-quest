@@ -24,11 +24,29 @@ const getAllProblem = asyncHandler(async (req, res) => {
             $unwind: "$createdBy",
         },
         {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "problem",
+                as: "likes",
+            },
+        },
+        {
+            $addFields: {
+                likeCount: { $size: "$likes" }, // Count total likes
+                isLikedByUser: {
+                    $in: [req.user._id, "$likes.likedBy"], // Check if user has liked
+                },
+            },
+        },
+        {
             $project: {
                 image: 1,
                 title: 1,
                 description: 1,
                 tags: 1,
+                likeCount: 1,
+                isLikedByUser: 1,
                 createdBy: {
                     fullName: 1,
                     username: 1,
@@ -89,7 +107,6 @@ const publishProblem = asyncHandler(async (req, res) => {
 
 const getProblemById = asyncHandler(async (req, res) => {
     const { problemId } = req.params;
-
     if (!isValidObjectId(problemId)) {
         throw new ApiError(400, "Invalid problem ID");
     }
@@ -112,11 +129,29 @@ const getProblemById = asyncHandler(async (req, res) => {
             $unwind: "$createdBy",
         },
         {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "problem",
+                as: "likes",
+            },
+        },
+        {
+            $addFields: {
+                likeCount: { $size: "$likes" }, // Count total likes
+                isLikedByUser: {
+                    $in: [req.user._id, "$likes.likedBy"], // Check if user has liked
+                },
+            },
+        },
+        {
             $project: {
                 image: 1,
                 title: 1,
                 description: 1,
                 tags: 1,
+                likeCount: 1,
+                isLikedByUser: 1,
                 createdBy: {
                     fullName: 1,
                     username: 1,
@@ -178,11 +213,29 @@ const getMyProblem = asyncHandler(async (req, res) => {
             $match: { "createdBy.username": username }, // Filter where the username matches
         },
         {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "problem",
+                as: "likes",
+            },
+        },
+        {
+            $addFields: {
+                likeCount: { $size: "$likes" }, // Count total likes
+                isLikedByUser: {
+                    $in: [req.user._id, "$likes.likedBy"], // Check if user has liked
+                },
+            },
+        },
+        {
             $project: {
                 image: 1,
                 title: 1,
                 description: 1,
                 tags: 1,
+                likeCount: 1,
+                isLikedByUser: 1,
                 createdBy: {
                     fullName: 1,
                     username: 1,

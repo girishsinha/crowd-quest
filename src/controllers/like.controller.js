@@ -7,7 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 const toggleProblemLike = asyncHandler(async (req, res) => {
     const { problemId } = req.params
     if (!isValidObjectId(problemId)) {
-        throw new ApiError(400, "Invalid Video ID");
+        throw new ApiError(400, "Invalid Problem ID");
     }
     const user = req.user._id;
     const likedProblem = await Like.findOne({
